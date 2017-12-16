@@ -1260,8 +1260,11 @@ def VideoPage(video_info):
             rating_key = video_info['url']+'/thumbs', source_title='ClipHunter',
             title='Video Thumbs', thumb=R(ICON_PHOTOALBUM), art=R(ART_CH)
             ))
-
-        related_thumb = html.xpath('//li[@itemtype]/a[@class="t"]/img/@src')[0]
+        try:
+            related_thumb = html.xpath('//li/a[@class="t"]/img/@src')[0]
+        except:
+            related_thumb = 'notfound'
+            continue
         oc.add(DirectoryObject(
             key=Callback(DirectoryList, title='Related', href=video_info['url'].split(CH_BASE_URL)[1], page=1),
             title='Related Videos', thumb=related_thumb, art=R(ART_CH)
