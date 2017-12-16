@@ -1267,12 +1267,14 @@ def VideoPage(video_info):
             try:
                 related_thumb = html.xpath('//li/a[@class="t"]/img/@src')[0]
             except:
-                related_thumb = 'https://www.google.co.uk/images/branding/googlelogo/2x/googlelogo_color_120x44dp.png'
+                related_thumb = ''
 
-        oc.add(DirectoryObject(
-            key=Callback(DirectoryList, title='Related', href=video_info['url'].split(CH_BASE_URL)[1], page=1),
-            title='Related Videos', thumb=related_thumb, art=R(ART_CH)
-            ))
+        if related_thumb != '':
+            oc.add(DirectoryObject(
+                key=Callback(DirectoryList, title='Related', href=video_info['url'].split(CH_BASE_URL)[1], page=1),
+                title='Related Videos', thumb=related_thumb, art=R(ART_CH)
+                ))
+
         mdl = html.xpath('//a[@class="materialButton mdl ps-popover"]')
         if mdl:
             p_name = mdl[0].text_content().strip()
