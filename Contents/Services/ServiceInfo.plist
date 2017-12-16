@@ -10,7 +10,7 @@
       <string>com.plexapp.plugins.cliphunter</string>
       <key>URLPatterns</key>
       <array>
-        <string>(?x)http://(?:www\.)?cliphunter\.com/w/([0-9]+)/(.+?)(?:$|[#\?])</string>
+        <string>(?x)https?://(?:www\.)?cliphunter\.com/w/([0-9]+)/(.+?)(?:$|[#\?])</string>
       </array>
       <key>TestURLs</key>
       <array>

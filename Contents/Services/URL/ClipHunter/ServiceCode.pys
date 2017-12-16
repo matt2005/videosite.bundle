@@ -64,7 +64,7 @@ def MediaObjectsForURL(url):
     for node in html.xpath('//script'):
         node_text = node.text_content()
         if 'mediaId' in node_text:
-            data = JSON.ObjectFromString(Regex('var\ gexoFiles\ =\ ({.+?});').search(node_text).group(1))
+            data = JSON.ObjectFromString(Regex('var\ gexoFiles\ =\ {.+"\d{7}_p720\.mp4":(.+?})};').group(1))
 
             for format_id, f in data.items():
                 video_url = f.get('url')
