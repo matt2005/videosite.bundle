@@ -5,7 +5,7 @@
   <key>CFBundleIdentifier</key>
   <string>com.plexapp.plugins.cliphunter</string>
   <key>CFBundleVersion</key>
-  <string>1.0.6.1</string>
+  <string>1.0.6.2</string>
   <key>PlexPluginVersionUrl</key>
   <string>https://api.github.com/repos/matt2005/ClipHunter.bundle/releases/latest</string>
   <key>PlexClientPlatforms</key>
