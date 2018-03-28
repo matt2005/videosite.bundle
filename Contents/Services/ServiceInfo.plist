@@ -4,10 +4,10 @@
 <dict>
   <key>URL</key>
   <dict>
-    <key>ClipHunter</key>
+    <key>Videosite</key>
     <dict>
       <key>Identifier</key>
-      <string>com.plexapp.plugins.cliphunter</string>
+      <string>com.plexapp.plugins.videosite</string>
       <key>URLPatterns</key>
       <array>
         <string>(?x)https?://(?:www\.)?cliphunter\.com/w/([0-9]+)/(.+?)(?:$|[#\?])</string>
