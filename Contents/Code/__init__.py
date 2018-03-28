@@ -9,7 +9,7 @@ from DumbTools import DumbKeyboard
 
 # ClipHunter
 CH_TITLE = L('ch_title')
-CH_PREFIX = L('ch_prefix')
+CH_PREFIX = '/video/videosite'
 CH_BASE_URL = 'http://www.cliphunter.com'
 ICON_CH = 'icon-default-ch.png'
 ICON_BM_CH = 'icon-bookmarks-ch.png'

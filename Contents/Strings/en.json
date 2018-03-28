@@ -1,6 +1,5 @@
 {
   "ch_title": "Videosite",
-  "ch_prefix": "/video/videosite",
   
   "updater.success": "Success",
   "updater.error": "Error",
