@@ -118,7 +118,7 @@ def CategoryList(title):
     cat_list = []
     for node in html.xpath('//div/a[contains(@href, "categories")]'):
         href = node.get('href').replace(' ', '%20')
-        name = node.get('title').strip()
+        name = node.xpath('./span[contains(@class, "title")]')[0]
         img = node.xpath('./img/@src')[0]
         if (name != 'All') and ((name, href, img) not in cat_list):
             cat_list.append((name, href, img))
