@@ -7,10 +7,10 @@ import bookmarks
 from updater import Updater
 from DumbTools import DumbKeyboard
 
-# ClipHunter
+# AnySex
 CH_TITLE = L('ch_title')
 CH_PREFIX = '/video/videosite'
-CH_BASE_URL = 'http://www.cliphunter.com'
+CH_BASE_URL = 'http://www.anysex.com'
 ICON_CH = 'icon-default-ch.png'
 ICON_BM_CH = 'icon-bookmarks-ch.png'
 ICON_BM_ADD_CH = 'icon-add-bookmark-ch.png'
