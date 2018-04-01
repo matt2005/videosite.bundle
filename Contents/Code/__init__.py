@@ -582,18 +582,18 @@ def DirectoryList(title, href, page):
 
     oc = ObjectContainer(title2=main_title, art=R(ART_CH))
 
-    for node in html.xpath('//li[@itemtype]'):
-        anode = node.xpath('./a[@class="t"]')[0]
+    for node in html.xpath('//li[@class ="item "]'):
+        anode = node.xpath('./a')[0]
         href = anode.get('href')
         vhref = CH_BASE_URL + href
-        vid = href.split('/')[2]
-        thumb = anode.xpath('./img/@src')[0].strip()
+        vid = href.split('/')[1]
+        thumb = anode.xpath('./div/img/@src')[0].strip()
 
-        dur_node = anode.xpath('./div[@class="tr"]/text()')[0].split(':')
+        dur_node = anode.xpath('.//span[@class="time"]')[0].split(':')
         duration = (int(dur_node[0])*60000) + (int(dur_node[1])*1000)
 
-        vtitle = node.xpath('./a[starts-with(@class, "vttl")]/text()')[0].strip()
-        tagline = node.xpath('./div[starts-with(@class, "info")]/text()')[0].strip()
+        vtitle = node.xpath('./@title')[0].strip()
+        tagline = node.xpath('./div[starts-with(@class, "item_desc fulldesc")]')[0].strip()
 
         video_info = {
             'id': vid,
