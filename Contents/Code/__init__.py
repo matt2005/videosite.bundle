@@ -8,8 +8,8 @@ import bookmarks
 from updater import Updater
 from DumbTools import DumbKeyboard, DumbPrefs
 
-TITLE = 'LetFap'
-PREFIX = '/video/letfap'
+TITLE = 'videosite'
+PREFIX = '/video/videosite'
 BASE_URL = 'http://letfap.com'
 
 ICON = 'icon-default.png'
