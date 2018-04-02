@@ -36,20 +36,21 @@ class Bookmark(object):
             return MessageContainer(header, message)
 
     ################################################################################################
-    def add(self, title, url, thumb, category, item_id, duration, tagline):
+    def add(self, title, url, thumb, category, item_id, duration, tagline, date, summary):
         """Add bookmark to Dict"""
 
         new_bookmark = {
-            'id': item_id, 'title': title, 'url': url, 'thumb': thumb,
-            'category': category, 'duration': duration, 'tagline': tagline
+            'id': item_id, 'title': title, 'url': url, 'thumb': thumb, 'date': date,
+            'category': category, 'duration': duration, 'tagline': tagline, 'summary': summary
             }
-
         bm = Dict['Bookmarks']
+
         if not bm:
             Dict['Bookmarks'] = {category: [new_bookmark]}
             Dict.Save()
 
-            return self.message_container('Bookmarks', '\"%s\" has been added to your bookmarks.' %title)
+            return self.message_container('Bookmarks',
+                '\"%s\" has been added to your \"%s\" bookmark list.' %(title, category))
         elif category in bm.keys():
             if (True if [b['id'] for b in bm[category] if b['id'] == item_id] else False):
 
@@ -104,22 +105,23 @@ class Bookmark(object):
                 'ERROR: \"%s\" not found in \"%s\" bookmark list.' %(title, category))
 
     ################################################################################################
-    def add_remove_bookmark(self, oc, title, thumb, url, item_id, category, duration, tagline):
+    def add_remove_bookmark(self, oc, bm_info=dict):
         """Test if bookmark exist"""
 
-        if self.bookmark_exist(item_id, category):
+        if self.bookmark_exist(bm_info['id'], bm_info['category']):
             oc.add(DirectoryObject(
-                key=Callback(self.remove, title=title, item_id=item_id, category=category),
+                key=Callback(self.remove, title=bm_info['title'], item_id=bm_info['id'], category=bm_info['category']),
                 title='Remove Bookmark',
-                summary='Remove \"%s\" from your Bookmarks list.' %title,
+                summary='Remove \"%s\" from your Bookmarks list.' %bm_info['title'],
                 thumb=R(self.bm_rm_icon)
                 ))
         else:
             oc.add(DirectoryObject(
                 key=Callback(self.add,
-                    title=title, thumb=thumb, url=url, category=category,
-                    item_id=item_id, duration=duration, tagline=tagline),
+                    title=bm_info['title'], thumb=bm_info['thumb'], url=bm_info['url'],
+                    category=bm_info['category'], item_id=bm_info['id'], date=bm_info['date'],
+                    duration=bm_info['duration'], tagline=bm_info['tagline'], summary=bm_info['summary']),
                 title='Add Bookmark',
-                summary='Add \"%s\" to your Bookmarks list.' %title,
+                summary='Add \"%s\" to your Bookmarks list.' %bm_info['title'],
                 thumb=R(self.bm_add_icon)
                 ))

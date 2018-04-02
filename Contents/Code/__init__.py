@@ -1,494 +1,200 @@
 ####################################################################################################
 #                                                                                                  #
-#                               (Clip/Pic)Hunter Plex Channel                                      #
+#                                      LetFap Plex Channel                                         #
 #                                                                                                  #
 ####################################################################################################
+import messages
 import bookmarks
 from updater import Updater
-from DumbTools import DumbKeyboard
+from DumbTools import DumbKeyboard, DumbPrefs
 
-# AnySex
-CH_TITLE = L('ch_title')
-CH_PREFIX = '/video/videosite'
-CH_BASE_URL = 'http://www.anysex.com'
-ICON_CH = 'icon-default-ch.png'
-ICON_BM_CH = 'icon-bookmarks-ch.png'
-ICON_BM_ADD_CH = 'icon-add-bookmark-ch.png'
-ICON_BM_REMOVE_CH = 'icon-remove-bookmark-ch.png'
+TITLE = 'LetFap'
+PREFIX = '/video/letfap'
+BASE_URL = 'http://letfap.com'
+
+ICON = 'icon-default.png'
+ICON_BM = 'icon-bookmarks.png'
+ICON_BM_ADD = 'icon-add-bookmark.png'
+ICON_BM_REMOVE = 'icon-remove-bookmark.png'
+ICON_STAR = 'icon-pornstar.png'
+ICON_CAT = 'icon-category.png'
+ICON_LIKE = 'icon-like.png'
+ICON_RECENT = 'icon-recent.png'
 ICON_VIDEO = 'icon-video.png'
-ICON_SIM = 'icon-similar.png'
-ICON_CAT_CH = 'icon-tags-ch.png'
-ICON_LIST = 'icon-explore.png'
-ICON_TV = 'icon-tv.png'
-ICON_STARS = 'icon-stars.png'
-ICON_PSTARS_CH = 'icon-babe-ch.png'
-ICON_PLAYLIST = 'icon-playlist.png'
-ICON_UPDATE_CH = 'icon-update-ch.png'
-ART_CH = 'art-default-ch.jpg'
-bm_ch = bookmarks.Bookmark(CH_TITLE, CH_PREFIX, ICON_BM_ADD_CH, ICON_BM_REMOVE_CH)
+ICON_VIEWS = 'icon-views.png'
+ART = 'art-default.jpg'
 
-#/page/sort/all/rating/uploaded/duration/hd
-SORT = [
-    ('date', 'Date'), ('rel', 'Relevance'), ('views', 'Views'), ('rating', 'Rating')
-    ]
-RATING = [
-    ('all/all', 'All'), ('all/super', 'Super High'), ('all/high', 'High'), ('all/medium', 'Medium')
-    ]
-DURATION = [
-    ('all', 'All'), ('300', 'Short'), ('900', 'Medium'), ('1800', 'Long')
-    ]
-UPLOADED = [
-    ('all', 'Any Time'), ('today', 'Today'), ('yesterday', 'Yesterday'), ('week', 'This Week'),
-    ('month', 'This Month'), ('3months', '3 Months'), ('year', 'This Year')
-    ]
-CHANNELS = [
-    ('alphabetical', 'A-Z'), ('recently-updated', 'Recently Updated'),
-    ('most-popular', 'Most Popular'), ('top-rated', 'Top Rated'), ('most-viewed', 'Most Viewed'),
-    ('video-duration', 'Video Duration')
-    ]
-CHANNEL_OPT = [('rating', 'Best'), ('date', 'Newest'), ('views', 'Most Views')]
+MC = messages.NewMessageContainer(PREFIX, TITLE)
+BM = bookmarks.Bookmark(TITLE, PREFIX, ICON_BM_ADD, ICON_BM_REMOVE)
 
 ####################################################################################################
 def Start():
-    #HTTP.CacheTime = 0
     HTTP.CacheTime = CACHE_1HOUR
 
+    ObjectContainer.title1 = TITLE
+    ObjectContainer.art = R(ART)
+
+    DirectoryObject.thumb = R(ICON)
+    DirectoryObject.art = R(ART)
+
+    InputDirectoryObject.art = R(ART)
+
+    VideoClipObject.art = R(ART)
+
 ####################################################################################################
-@handler(CH_PREFIX, CH_TITLE, thumb=ICON_CH, art=ART_CH)
-def VideoMainMenu():
+@handler(PREFIX, TITLE, thumb=ICON, art=ART)
+def MainMenu():
     """Setup Main Menu, Includes Updater"""
 
-    oc = ObjectContainer(title2=CH_TITLE, art=R(ART_CH), no_cache=True)
+    oc = ObjectContainer(title2=TITLE, no_cache=True)
+    mhref = '/movie'
 
-    Updater(CH_PREFIX + '/updater', oc, ICON_UPDATE_CH)
+    Updater(PREFIX + '/updater', oc)
 
     oc.add(DirectoryObject(
-        key=Callback(HDOpt, title='Explore', href='/categories/All'),
-        title='Explore', thumb=R(ICON_LIST), art=R(ART_CH)
+        key=Callback(DirectoryList, title='Most Recent', href='%s?sort=published' %mhref, page=1),
+        title='Most Recent', thumb=R(ICON_RECENT)
         ))
     oc.add(DirectoryObject(
-        key=Callback(CategoryList, title='Categories'),
-        title='Categories', thumb=R(ICON_CAT_CH), art=R(ART_CH)
+        key=Callback(SortList, title='Most Viewed', href=mhref),
+        title='Most Viewed', thumb=R(ICON_VIEWS)
         ))
     oc.add(DirectoryObject(
-        key=Callback(ChannelList, title='Channels', href='/channels'),
-        title='Channels', thumb=R(ICON_TV), art=R(ART_CH)
+        key=Callback(SortList, title='Top Rated', href=mhref),
+        title='Top Rated', thumb=R(ICON_LIKE)
         ))
     oc.add(DirectoryObject(
-        key=Callback(PopularList, title='Popular', href='/popular/ratings'),
-        title='Popular', thumb=R(ICON_STARS), art=R(ART_CH)
+        key=Callback(CategoryList), title='Categories', thumb=R(ICON_CAT)
         ))
     oc.add(DirectoryObject(
-        key=Callback(PornstarOpt, title='Pornstars', href='/pornstars'),
-        title='Pornstars', thumb=R(ICON_PSTARS_CH), art=R(ART_CH)
+        key=Callback(SortListC, title='Pornstars', href='/pornstar'),
+        title='Pornstars', thumb=R(ICON_STAR)
         ))
-    #oc.add(DirectoryObject(key=Callback(Playlists, title='Playlists'), title='Playlists', thumb=R(ICON_PLAYLIST)))
-    oc.add(DirectoryObject(
-        key=Callback(ClipBookmarksMain),
-        title='My Bookmarks', thumb=R(ICON_BM_CH), art=R(ART_CH)
-        ))
-    #oc.add(PrefsObject(title='Preferences'))
+
+    oc.add(DirectoryObject(key=Callback(MyBookmarks), title='My Bookmarks', thumb=R(ICON_BM)))
+
+    if Client.Product in DumbPrefs.clients:
+        DumbPrefs(PREFIX, oc, title='Preferences', thumb=R('icon-prefs.png'))
+    else:
+        oc.add(PrefsObject(title='Preferences', thumb=R('icon-prefs.png')))
+
     if Client.Product in DumbKeyboard.clients:
-        DumbKeyboard(CH_PREFIX, oc, ClipSearch, dktitle='Search', dkthumb=R('icon-search.png'))
+        DumbKeyboard(PREFIX, oc, Search, dktitle='Search', dkthumb=R('icon-search.png'))
     else:
         oc.add(InputDirectoryObject(
-            key=Callback(ClipSearch),
-            title='Search', summary='Search ClipHunter', prompt='Search for...',
-            thumb=R('icon-search.png'), art=R(ART_CH)
+            key=Callback(Search), title='Search', summary='Search LetFap',
+            prompt='Search for...', thumb=R('icon-search.png')
             ))
 
     return oc
 
 ####################################################################################################
-@route(CH_PREFIX + '/validateprefs')
-def ValidatePrefs():
+@route(PREFIX + '/sortlist')
+def SortList(title, href):
     """
-    Validate Prefs
-    No Prefs to validate yet
+    Create sub list
+    Most Viewed, Top Rated
     """
 
+    sort = {
+        'Most Viewed': {
+            'All Time': 'view', 'Daily': 'viewday', 'Weekly': 'viewweek', 'Monthly': 'viewmonth'},
+        'Top Rated': {
+            'All Time': 'like', 'Daily': 'likeday', 'Weekly': 'likeweek', 'Monthly': 'likemonth'}
+        }
+
+    oc = ObjectContainer(title2=title)
+    s = title.split('/')[-1].strip()
+
+    for k in sorted(sort[s].keys()):
+        t = k if k == title else '%s / %s' %(title, k)
+        if ('Pornstar' in title) and (not 'Search' in title):
+            oc.add(DirectoryObject(
+                key=Callback(PornstarList,
+                    title=t, href='%s%ssort=%s&direction=desc' %(href, ('&' if '?' in href else '?'), sort[s][k]),
+                    page=1),
+                title=k
+                ))
+        else:
+            oc.add(DirectoryObject(
+                key=Callback(DirectoryList,
+                    title=t, href='%s%ssort=%s' %(href, ('&' if '?' in href else '?'), sort[s][k]),
+                    page=1),
+                title=k
+                ))
+
+    return oc
+
 ####################################################################################################
-@route(CH_PREFIX + '/categorylist')
-def CategoryList(title):
+@route(PREFIX + '/categorylist')
+def CategoryList():
     """Setup Category List"""
 
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    url = CH_BASE_URL + '/categories/'
-    html = HTML.ElementFromURL(url)
-    cat_list = []
-    for node in html.xpath('//div/a[contains(@href, "categories")]'):
-        href = node.get('href').replace(' ', '%20')
-        name = node.xpath('./span[contains(@class, "title")]')[0]
-        img = node.xpath('./img/@src')[0]
-        if (name != 'All') and ((name, href, img) not in cat_list):
-            cat_list.append((name, href, img))
-    for (n, h, i) in sorted(cat_list):
+    oc = ObjectContainer(title2='Categories')
+
+    html = HTML.ElementFromURL(BASE_URL)
+    for a in html.xpath('//div[starts-with(@class, "categories-wrapper")]//a'):
+        href = a.get('href')
+        href = href if href.startswith('/') else '/' + href
+        name = a.text.strip()
         oc.add(DirectoryObject(
-            key=Callback(HDOpt, title='Category / %s' %n, href=h),
-            title=n, thumb=i, art=R(ART_CH)
+            key=Callback(SortListC, title='Category / %s' %name, href=href),
+            title=name, summary='%s Genre List ' %name
             ))
+
     return oc
 
 ####################################################################################################
-@route(CH_PREFIX + '/hd-opt')
-def HDOpt(title, href):
-    """
-    Default, Channels
-    All, HD
-    """
+@route(PREFIX + '/sortlist/c')
+def SortListC(title, href, search=False):
 
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    oc.add(DirectoryObject(
-        key=Callback(DirectoryList, title='%s / Default' %title, href=href, page=1),
-        title='Default (Site Default List)', art=R(ART_CH)
-        ))
-    if 'Channels' in title:
+    oc = ObjectContainer(title2=title)
+
+    if search:
         oc.add(DirectoryObject(
-            key=Callback(ChannelOpt, title='%s / All' %title, href=href, hd=0),
-            title='All (SD & HD)', art=R(ART_CH)
+            key=Callback(DirectoryList, title='%s / Relevance' %title, href=href, page=1),
+            title='Relevance'
             ))
+
+    if ('Pornstar' in title) and (search == False):
         oc.add(DirectoryObject(
-            key=Callback(ChannelOpt, title='%s / HD' %title, href=href, hd=1),
-            title='HD (HD Only)', art=R(ART_CH)
+            key=Callback(PornstarList,
+                title='%s / Most Recent' %title,
+                href='%s?sort=id&direction=desc' %href,
+                page=1),
+            title='Most Recent'
             ))
     else:
-        oc.add(DirectoryObject(
-            key=Callback(SortBy, title='%s / All' %title, href=href, hd=0),
-            title='All (SD & HD)', art=R(ART_CH)
-            ))
-        oc.add(DirectoryObject(
-            key=Callback(SortBy, title='%s / HD' %title, href=href, hd=1),
-            title='HD (HD Only)', art=R(ART_CH)
-            ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/sortby')
-def SortBy(title, href, hd):
-    """Sort By (Date, Relevance, Views, Rating)"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    for h, s in SORT:
-        oc.add(DirectoryObject(
-            key=Callback(Rating, title='%s / %s' %(title, s), href='%s/1/%s' %(href, h), hd=hd),
-            title=s, art=R(ART_CH)
-            ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/rating')
-def Rating(title, href, hd):
-    """Rating (All, Super High, High, Medium)"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    for h, s in RATING:
-        oc.add(DirectoryObject(
-            key=Callback(Uploaded, title='%s / %s' %(title, s), href='%s/%s' %(href, h), hd=hd),
-            title=s, art=R(ART_CH)
-            ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/uploaded')
-def Uploaded(title, href, hd):
-    """Uploaded (Any Time, Today, Yesterday, This Week, This Month, 3 Months, This Year)"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    for h, s in UPLOADED:
-        oc.add(DirectoryObject(
-            key=Callback(Duration, title='%s / %s' %(title, s), href='%s/%s' %(href, h), hd=hd),
-            title=s, art=R(ART_CH)
-            ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/duration')
-def Duration(title, href, hd):
-    """Duration (All, Short, Medium, Long)"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    for h, s in DURATION:
-        oc.add(DirectoryObject(
-            key=Callback(DirectoryList, title='%s / %s' %(title, s), href='%s/%s/%s' %(href, h, hd), page=1),
-            title=s, art=R(ART_CH)
-            ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/channel/list')
-def ChannelList(title, href):
-    """Recently Updated, Most Popular, Top Rated, Most Viewed, A-Z"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    for h, s in CHANNELS:
-        if h != 'alphabetical':
-            oc.add(DirectoryObject(
-                key=Callback(Channels, title='%s / %s' %(title, s), href='%s/%s' %(href, h)),
-                title=s, art=R(ART_CH)
-                ))
-        else:
-            oc.add(DirectoryObject(
-                key=Callback(Alphabetical, title='%s / A-Z' %title, href='%s/alphabetical' %href),
-                title='A-Z', art=R(ART_CH)
-                ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/abc')
-def Alphabetical(title, href):
-    """All, A-Z"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    if 'channels' in href:
-        oc.add(DirectoryObject(
-            key=Callback(Channels, title='%s / All' %title, href=href),
-            title='All', art=R(ART_CH)
-            ))
-        for c in ['#'] + abc():
-            oc.add(DirectoryObject(
-                key=Callback(
-                    Channels, title='%s / %s' %(title, c),
-                    href='%s/1/%s' %(href, c.lower() if c != '#' else '1')),
-                title=c, art=R(ART_CH)
-                ))
-    else:
-        oc.add(DirectoryObject(
-            key=Callback(PornstarList, title='%s / All' %title, href=href),
-            title='All', art=R(ART_CH)
-            ))
-        for c in abc():
-            oc.add(DirectoryObject(
-                key=Callback(
-                    PornstarList, title='%s / %s' %(title, c),
-                    href='%s/%s/overview' %(href, c.lower())),
-                title=c, art=R(ART_CH)
-                ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/channels')
-def Channels(title, href):
-    """List channels"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    html = HTML.ElementFromURL(CH_BASE_URL + href)
-    nextpg = nextpg_href(html)
-    for node in html.xpath('//ul[@class="moviethumbs bigthumbs channelList resizable ignoreViewSwitch"]/li'):
-        anode = node.xpath('./a[@class="chtl"]')[0]
-        chref = anode.get('href')
-        name = anode.text
-
-        bthumb = node.xpath('./a[@class="t"]/img/@src')[0]
-        athumb = node.xpath('./a[@class="chtlgx"]/img/@src')[0]
-
-        sum_string = []
-        for s in node.xpath('./a[@class="chtlgx"]/b'):
-            sum_string.append(s.text)
-        summary = ' | '.join([s for s in sum_string])
-
-        oc.add(DirectoryObject(
-            key=Callback(HDOpt, title='%s / %s' %(title, name), href=chref),
-            title=name, thumb=athumb if athumb else bthumb, art=R(ART_CH)
-            ))
-    if nextpg:
-        oc.add(NextPageObject(
-            key=Callback(Channels, title=title, href=nextpg),
-            title='Next Page>>', art=R(ART_CH)
-            ))
-
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/channel/opt')
-def ChannelOpt(title, href, hd):
-    """Best, Newest, Most Views"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    for h, s in CHANNEL_OPT:
-        oc.add(DirectoryObject(
-            key=Callback(DirectoryList, title='%s / %s' %(title, s), href='%s/1/%s/%s' %(href, h, hd), page=1),
-            title=s, art=R(ART_CH)
-            ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/popular')
-def PopularList(title, href):
-    """Today, Yesterday, Week, Month, Year, Hall of Fame"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    plist = ['Today', 'Yesterday', 'Week', 'Month', 'Year', 'Hall of Fame']
-    for s in plist:
         oc.add(DirectoryObject(
             key=Callback(DirectoryList,
-                title='%s / %s' %(title, s),
-                href='%s/%s/1' %(href, s.lower() if s != 'Hall of Fame' else 'all'), page=1),
-            title=s, art=R(ART_CH)
+                title='%s / Most Recent' %title,
+                href='%s%ssort=published' %(href, ('&' if search else '?')),
+                page=1),
+            title='Most Recent'
             ))
-    return oc
 
-####################################################################################################
-@route(CH_PREFIX + '/pornstar/opt')
-def PornstarOpt(title, href):
-    """Ratings, Followers, A-Z"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    pslist = [('top', 'Ratings'), ('mostfollowed', 'Followers')]
-    oc.add(DirectoryObject(
-        key=Callback(Alphabetical, title='%s / A-Z' %title, href=href),
-        title='A-Z', art=R(ART_CH)
-        ))
-    for (h, s) in pslist:
+    sort_list = ['Most Viewed', 'Top Rated']
+    for s in sort_list:
         oc.add(DirectoryObject(
-            key=Callback(PornstarList, title='%s / %s' %(title, s), href='%s/%s' %(href, h)),
-            title=s, art=R(ART_CH)
+            key=Callback(SortList, title='%s / %s' %(title, s), href=href), title=s
             ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/pornstar/list')
-def PornstarList(title, href):
-    """List Pornstars"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    html = HTML.ElementFromURL(CH_BASE_URL + href)
-    nextpg = nextpg_href(html)
-    for node in html.xpath('//div[@class="paper paperSpacings xs-fullscreen photoGrid"]/a'):
-        phref = node.get('href')
-        thumb = node.xpath('./img/@src')[0]
-        name = node.xpath('./div/span/text()')[0]
-
-        oc.add(DirectoryObject(
-            key=Callback(PornstarCH, title='%s / %s' %(title, name), href=phref, thumb=thumb),
-            title=name, thumb=Resource.ContentsOfURLWithFallback(thumb, 'icon-babe-miss.png'),
-            art=R(ART_CH)
-            ))
-    if nextpg:
-        oc.add(NextPageObject(
-            key=Callback(PornstarList, title=title, href=nextpg),
-            title='Next Page>>', art=R(ART_CH)
-            ))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/pornstar')
-def PornstarCH(title, href, thumb):
-    """Videos, Photos"""
-
-    html = HTML.ElementFromURL(CH_BASE_URL + href)
-
-    bm_title = title.split('/')[-1].strip()
-    bm_id = bm_title.lower().replace(' ', '_')
-    ps_error = html.xpath('//meta[@name="canonical"]/@content')[0]
-    match = bm_ch.bookmark_exist(item_id=bm_id, category='ClipPornstar')
-    header = None
-    message = None
-
-    if 'search' in ps_error:
-        if match:
-            header = title
-            message = 'Pornstar Removed from site'
-        else:
-            return bm_ch.message_container('Warning', 'Pornstar Not Found')
-
-    oc = ObjectContainer(title2=title, header=header, message=message, art=R(ART_CH), no_cache=True)
-
-    if not 'search' in ps_error:
-        oc.add(DirectoryObject(
-            key=Callback(HDOpt, title='%s / Videos' %title, href='%s/movies' %href),
-            title='Videos', thumb=R(ICON_VIDEO), art=R(ART_CH)
-            ))
-        oc.add(DirectoryObject(
-            key=Callback(PhotoAlbumList,
-                title='%s / Photos' %title,
-                href='%s/photos/1' %href.replace('pornstars', 'models')),
-            title='Photos', thumb=R(ICON_PHOTO), art=R(ART_PH)
-            ))
-        oc.add(DirectoryObject(
-            key=Callback(PornstarCHSimilar, title='%s / Similar' %title, href=href),
-            title='Similar Pornstars', thumb=R(ICON_SIM), art=R(ART_CH)
-            ))
-
-    if not thumb:
-        html = HTML.ElementFromURL(CH_BASE_URL + href)
-        thumb = html.xpath('//img[@id="modelpic"]/@src')[0]
-    bm_ch.add_remove_bookmark(
-        oc=oc, title=bm_title, thumb=thumb, url=href, item_id=bm_id,
-        category='ClipPornstar', duration=None, tagline=None
-        )
 
     return oc
 
 ####################################################################################################
-@route(CH_PREFIX + '/pornstar/similar')
-def PornstarCHSimilar(title, href):
-    """List simialr pornstars"""
+@route(PREFIX + '/search')
+def Search(query=''):
+    """Search LetFap"""
 
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    html = HTML.ElementFromURL(CH_BASE_URL + href)
-    for node in html.xpath('//div[@class="links"]'):
-        simnode = node.xpath('./div[@class="frontpageCatTable"]')[0]
-        for node2 in simnode.xpath('.//a'):
-            phref = node2.get('href')
-            thumb = node2.get('data-ps-thumb')
-            name = node2.text
-            oc.add(DirectoryObject(
-                key=Callback(PornstarCH,
-                    title='%s / %s' %(title.rsplit('/', 2)[0], name),
-                    href=phref, thumb=thumb),
-                title=name, thumb=thumb, art=R(ART_CH)
-                ))
-    if len(oc) > 0:
-        return oc
-    else:
-        return bm_ch.message_container('Similar Pornstar', 'Similar Pornstar list Empty')
-
-####################################################################################################
-@route(CH_PREFIX + '/search')
-def ClipSearch(query=''):
-    """Search ClipHunter"""
-
-    href = '/search/%s' %String.Quote(query.strip(), usePlus=True)
+    query = query.strip()
+    href = '/movie?q=%s' %String.Quote(query, usePlus=True)
     title = 'Search / %s' %query
 
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    data = JSON.ObjectFromURL(CH_BASE_URL + '/a/autocomplete?type=model&txt=%s' %String.Quote(query.strip(), usePlus=False))
-    if len(data) > 0:
-        oc.add(DirectoryObject(
-            key=Callback(CHPSearch, query=query.strip(), data=data),
-            title='Pornstars', thumb=R(ICON_PSTARS_CH), art=R(ART_CH)
-            ))
-        oc.add(DirectoryObject(
-            key=Callback(HDOpt, title=title, href=href),
-            title='Videos', thumb=R(ICON_VIDEO), art=R(ART_CH)
-            ))
-        return oc
-    else:
-        return HDOpt(title, href)
+    return SortListC(title, href, True)
 
 ####################################################################################################
-@route(CH_PREFIX + '/pornstar/search', data=list)
-def CHPSearch(query, data):
-
-    if len(data) == 1:
-        t = data[0]
-        h = '/pornstars/%s' %String.Quote(t, usePlus=True)
-        thumb = HTTP.Request(CH_BASE_URL + '/a/modelthumb?name=%s' %String.Quote(t, usePlus=True)).content
-        return PornstarCH(t, h, thumb)
-    else:
-        oc = ObjectContainer(title2='Search / %s' %query, art=R(ART_CH))
-        for d in data:
-            h = '/pornstars/%s' %String.Quote(d, usePlus=True)
-            thumb = HTTP.Request(CH_BASE_URL + '/a/modelthumb?name=%s' %String.Quote(d, usePlus=True)).content
-            oc.add(DirectoryObject(
-                key=Callback(PornstarCH, title=d, href=h, thumb=thumb), title=d,
-                thumb=thumb, art=R(ART_CH)
-                ))
-        return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/bookmarks/main')
-def ClipBookmarksMain():
+@route(PREFIX + '/bookmark/list')
+def MyBookmarks():
     """
     Setup Bookmark Main Menu.
     Seperate by Pornstar and Video
@@ -496,246 +202,283 @@ def ClipBookmarksMain():
 
     bm = Dict['Bookmarks']
     if not bm:
-        return bm_ph.message_container('Bookmarks', 'Bookmarks list Empty')
+        return MC.message_container('Bookmarks', 'Bookmark List Empty')
 
-    oc = ObjectContainer(title2='My Bookmarks', art=R(ART_CH), no_cache=True)
+    oc = ObjectContainer(title2='My Bookmarks', no_cache=True)
 
     for key in sorted(bm.keys()):
         if len(bm[key]) == 0:
             del Dict['Bookmarks'][key]
             Dict.Save()
         else:
-            if key == 'ClipPornstar':
-                oc.add(DirectoryObject(
-                    key=Callback(ClipBookmarksSub, category=key),
-                    title='Pornstars', summary='Display Pornstar Bookmarks',
-                    thumb=R(ICON_PSTARS_CH), art=R(ART_CH)
-                    ))
-            elif key == 'Video':
-                oc.add(DirectoryObject(
-                    key=Callback(ClipBookmarksSub, category=key),
-                    title='Videos', summary='Display Video Bookmarks',
-                    thumb=R(ICON_VIDEO), art=R(ART_CH)
-                    ))
+            oc.add(DirectoryObject(
+                key=Callback(BookmarksSub, category=key),
+                title=key, summary='Display Pornstar Bookmarks',
+                thumb=R('icon-%s.png' %key.lower())
+                ))
 
     if len(oc) > 0:
         return oc
     else:
-        return bm_ch.message_container('Bookmarks', 'Bookmark list Empty')
+        return MC.message_container('Bookmarks', 'Bookmark List Empty')
 
 ####################################################################################################
-@route(CH_PREFIX + '/bookmarks/sub')
-def ClipBookmarksSub(category):
+@route(PREFIX + '/bookmark/sub')
+def BookmarksSub(category):
     """List Bookmarks Alphabetically"""
 
     bm = Dict['Bookmarks']
     if not category in bm.keys():
-        return bm_ph.message_container('Error',
+        return MC.message_container('Error',
             '%s Bookmarks list is dirty, or no %s Bookmark list exist.' %(category, category))
 
-    oc = ObjectContainer(title2='My Bookmarks | %s' %category, art=R(ART_CH), no_cache=True)
+    oc = ObjectContainer(title2='My Bookmarks / %s' %category, no_cache=True)
 
     for bookmark in sorted(bm[category], key=lambda k: k['title']):
         title = bookmark['title']
         thumb = bookmark['thumb']
         url = bookmark['url']
-        category = bookmark['category']
-        vid = bookmark['id']
+        item_id = bookmark['id']
         duration = bookmark['duration']
         tagline = bookmark['tagline']
+        summary = bookmark['summary']
+        date = bookmark['date']
 
-        if category == 'ClipPornstar':
-            oc.add(DirectoryObject(
-                key=Callback(PornstarCH, title=title, href=url, thumb=thumb),
-                title=title, thumb=Resource.ContentsOfURLWithFallback(thumb, 'icon-babe-miss.png'),
-                art=R(ART_CH)
-                ))
-        elif category == 'Video':
-            video_info = {
-                'id': vid, 'title': title, 'duration': int(duration),
-                'tagline': tagline, 'thumb': thumb, 'url': url
-                }
+        video_info = {
+            'id': item_id, 'title': title, 'duration': duration, 'thumb': thumb, 'url': url,
+            'tagline': tagline, 'date': date, 'summary': summary, 'category': category
+            }
+
+        if category == 'Video':
             oc.add(DirectoryObject(
                 key=Callback(VideoPage, video_info=video_info),
-                title=title, thumb=thumb, art=R(ART_CH)
+                title=title, thumb=thumb
+                ))
+        elif category == 'Pornstar':
+            oc.add(DirectoryObject(
+                key=Callback(PornstarSubList, title=title, href=url, pid=item_id, thumb=thumb),
+                title=title, thumb=thumb
                 ))
 
     if len(oc) > 0:
         return oc
     else:
-        return bm_ch.message_container('Bookmarks', '%s Bookmarks list Empty' %category)
+        return MC.message_container('Bookmarks', '%s Bookmarks list Empty' %category)
 
 ####################################################################################################
-@route(CH_PREFIX + '/directorylist', page=int)
+@route(PREFIX + '/pornstar/list', page=int)
+def PornstarList(title, href, page, oc=False, container=True):
+    """Setup Pornstar list"""
+
+    url = BASE_URL + href
+    html = HTML.ElementFromURL(url)
+    href_next = html.xpath('//li[@class="next"]/a/@href')
+    if href_next or (page > 1):
+        main_title = '%s / Page %i' %(title, page)
+    else:
+        main_title = title
+
+    if not oc:
+        oc = ObjectContainer(title2=main_title)
+
+    for p in html.xpath('//div[@class="pornstar-item"]'):
+        a0 = p.xpath('.//a')[0]
+        phref = a0.get('href')
+        phref = phref if phref.startswith('/') else '/' + phref
+        pid = phref.split('/', 2)[2].rsplit('.', 1)[-2]
+        pname = a0.get('title')
+        thumb = a0.xpath('./img/@src')[0]
+        vcount = p.xpath('.//span[@class="total-like"]')
+        pvname = pname
+        if vcount:
+            pvname = '%s (%s)' %(pname, vcount[0].text_content().strip())
+
+        oc.add(DirectoryObject(
+            key=Callback(PornstarSubList,
+                title='%s / %s' %(title, pname), href=phref, pid=pid, thumb=thumb),
+            title=pvname, thumb=thumb
+            ))
+
+    if href_next and container:
+        nhref = href_next[0]
+        nhref = nhref if nhref.startswith('/') else '/' + nhref
+        oc.add(NextPageObject(
+            key=Callback(PornstarList, title=title, href=nhref, page=page + 1),
+            title='Next Page>>'))
+
+    if container:
+        return oc
+
+####################################################################################################
+@route(PREFIX + '/pornstar/list/sub')
+def PornstarSubList(title, href, pid, thumb):
+    """
+    Setup Pornstar options
+    Videos, Related Pornstars, and Bookmark options
+    """
+
+    oc = ObjectContainer(title2=title, no_cache=True)
+
+    oc.add(DirectoryObject(
+        key=Callback(DirectoryList, title=title + ' / Videos', href=href, page=1),
+        title='Videos', thumb=R('icon-video.png')
+        ))
+
+    oc.add(DirectoryObject(
+        key=Callback(PornstarList, title=title + ' / Related Pornstars', href=href, page=1),
+        title='Related Pornstars', thumb=R('icon-pornstar.png')
+        ))
+
+    bm_info = {
+            'id': pid, 'title': title.split('/')[-1].strip(), 'duration': 'none',
+            'thumb': thumb, 'url': href, 'tagline': 'none', 'date': 'none',
+            'summary': 'none', 'category': 'Pornstar'
+            }
+    BM.add_remove_bookmark(oc, dict(bm_info))
+
+    return oc
+
+
+####################################################################################################
+@route(PREFIX + '/directory/list', page=int)
 def DirectoryList(title, href, page):
     """List Videos by page"""
 
-    url = CH_BASE_URL + href
+    url = BASE_URL + href
 
     html = HTML.ElementFromURL(url)
 
-    nextpg_node = html.xpath('//li/a[@rel="next"]')
-    if page == 1 and not nextpg_node:
-        main_title = title
+    href_next = html.xpath('//a[contains(@class, "movie-next-page")]/@href')
+    if href_next or (page > 1):
+        main_title = '%s / Page %i' %(title, page)
     else:
-        main_title = '%s | Page %i' %(title, page) if nextpg_node else '%s | Page %i | Last Page' %(title, page)
+        main_title = title
 
-    oc = ObjectContainer(title2=main_title, art=R(ART_CH))
+    oc = ObjectContainer(title2=main_title)
 
-    for node in html.xpath('//li[@class ="item "]'):
-        anode = node.xpath('./a')[0]
-        href = anode.get('href')
-        vhref = CH_BASE_URL + href
-        vid = href.split('/')[1]
-        thumb = anode.xpath('./div/img/@src')[0].strip()
+    for v in html.xpath('//div[@class="video-item"]'):
+        a0 = v.xpath('.//a')[0]
+        vhref = a0.get('href')
+        vhref = vhref if vhref.startswith('/') else '/' + vhref
+        vid = vhref.split('/', 2)[2].rsplit('.', 1)[-2]
+        name = a0.get('title')
+        thumb = a0.xpath('./img/@src')[0]
 
-        dur_node = anode.xpath('.//span[@class="time"]')[0].split(':')
-        duration = (int(dur_node[0])*60000) + (int(dur_node[1])*1000)
+        duration = v.xpath('.//span[@class="duration"]/text()')[0]
 
-        vtitle = node.xpath('./@title')[0].strip()
-        tagline = node.xpath('./div[starts-with(@class, "item_desc fulldesc")]')[0].strip()
+        p = v.xpath('.//p')[0]
+        for s in p.xpath('./span/text()'):
+            if 'views' in s:
+                views = s
+            elif 'likes' in s:
+                likes = s
+            else:
+                date = s
+        tagline = 'Likes: %s | Views: %s' %(likes.split(' ')[0], views.split(' ')[0])
 
         video_info = {
-            'id': vid,
-            'title': vtitle,
-            'duration': duration,
-            'tagline': tagline,
-            'thumb': thumb,
-            'url': vhref
+            'id': vid, 'title': name, 'duration': duration, 'thumb': thumb, 'url': vhref,
+            'tagline': tagline, 'date': date
             }
 
-        oc.add(DirectoryObject(
-            key=Callback(VideoPage, video_info=video_info),
-            title=vtitle, thumb=thumb, tagline=tagline, art=R(ART_CH)
-            ))
+        oc.add(DirectoryObject(key=Callback(VideoPage, video_info=video_info), title=name, thumb=thumb))
 
-    if nextpg_node:
-        href = nextpg_node[0].get('href')
-        if ('popular' in href) or ('pornstars' in href):
-            nextpg = int(href.split('/')[4])
-        else:
-            nextpg = int(href.split('/')[3])
+    if href_next:
+        nhref = href_next[0]
+        nhref = nhref if nhref.startswith('/') else '/' + nhref
         oc.add(NextPageObject(
-            key=Callback(DirectoryList, title=title, href=href, page=nextpg),
-            title='Next Page>>', art=R(ART_CH)
-            ))
+            key=Callback(DirectoryList, title=title, href=nhref, page=page + 1),
+            title='Next Page>>'))
 
     if len(oc) > 0:
         return oc
     else:
-        return bm_ch.message_container('Video List', 'Video List Empty')
+        return MC.message_container('Videos', 'Video List Empty')
 
 ####################################################################################################
-@route(CH_PREFIX + '/video/thumbs/bin')
-def CHPhotoBin(title, thumb, url):
-    """Create PhotoAlbum for photos in href"""
-
-    oc = ObjectContainer(title2=title, art=R(ART_CH))
-    page = HTTP.Request(url).content
-    re_count = Regex(r'var\ mov\_thumbs\ \=\ (\d+?)\;').search(page)
-    count = int(re_count.group(1)) if re_count else 30
-    it = Regex(r'(.*)\_(\d+)(.*)').search(thumb)
-    for i in xrange(count):
-        oc.add(CreatePhotoObject(title=str(i+1), url=it.group(1)+'_%i' %(i+1)+it.group(3)))
-    return oc
-
-####################################################################################################
-@route(CH_PREFIX + '/videopage', video_info=dict)
+@route(PREFIX + '/videopage', video_info=dict)
 def VideoPage(video_info):
     """
     Video Sub Page
     Includes Similar Videos and Bookmark Option
     """
 
-    html = HTML.ElementFromURL(video_info['url'])
-    video_removed = html.xpath('//blockquote')
-    match = bm_ch.bookmark_exist(item_id=video_info['id'], category='Video')
+    bm = Dict['Bookmarks']
+    url = BASE_URL + video_info['url']
+    html = HTML.ElementFromURL(url)
     header = None
     message = None
-
-    if video_removed:
-        if match:
+    duration = video_info['duration']
+    summary = video_info['summary'] if 'summary' in video_info.keys() else 'NA'
+    error = False
+    offline = False
+    match = BM.bookmark_exist(item_id=video_info['id'], category='Video')
+    video_info.update({'category': 'Video', 'summary': summary})
+    if match:
+        error = html.xpath('//h3[contains(@class, "not-found-movie")]')
+        if error:
             header = video_info['title']
-            message = video_removed[0].text_content().strip()
+            message = 'This video is no longer available.'
+
+    oc = ObjectContainer(title2=video_info['title'], header=header, message=message, no_cache=True)
+
+    if not error:
+        duration = None
+        summary = video_info['summary']
+        genres = []
+        tags = []
+        for md in html.xpath('//div[@class="box movie-detail"]'):
+            p0 = md.xpath('./p')[0].text_content().strip()
+            dur = Regex('Duration\:\ (\d+)(.+)').search(p0)
+            duration = int(dur.group(1).strip()) * (60000 if 'min' in dur.group(2) else 3600000)
+
+            summary2 = md.xpath('./p')[1].text_content().strip()
+            genres = md.xpath('//ul[@class="links links-categories"]/li/a/text()')
+            tags = md.xpath('//ul[@class="links links-tags"]/li/a/text()')
+
+        video_info.update({'duration': str(duration) if duration else 'none', 'summary': summary})
+
+        if [s.get('data-res') for s in html.xpath('//video/source') if (s.get('type') == "video/mp4")]:
+            oc.add(VideoClipObject(
+                title=video_info['title'],
+                source_title='LetFap',
+                tagline=video_info['tagline'],
+                originally_available_at=Datetime.ParseDate(video_info['date']),
+                year=int(Datetime.ParseDate(video_info['date']).year),
+                summary=summary2 if summary2 else summary,
+                genres=genres,
+                tags=tags,
+                duration=duration,
+                thumb=video_info['thumb'],
+                url=url
+                ))
         else:
-            return bm_ch.message_container('Warning', 'This video is no longer available.')
+            Log.Warn(u"* video offline for '{}'".format(url))
+            offline = True
+            oc.header = "Warning"
+            oc.message = u"WARNING: Video Offline for '{}'".format(video_info['title'])
 
-    oc = ObjectContainer(title2=video_info['title'], header=header, message=message, art=R(ART_CH), no_cache=True)
-
-    if not video_removed:
-        oc.add(VideoClipObject(
-            title=video_info['title'],
-            duration=video_info['duration'],
-            summary=video_info['tagline'],
-            thumb=video_info['thumb'],
-            art=R(ART_CH),
-            url=video_info['url']
+    similar_node = html.xpath('//div[@class="video-item"]')
+    if similar_node:
+        s_thumb = similar_node[0].xpath('.//a/img/@src')[0]
+        oc.add(DirectoryObject(
+            key=Callback(DirectoryList, title='Suggested Videos', href=video_info['url'], page=1),
+            title='Suggested Videos', thumb=s_thumb
             ))
 
-        oc.add(PhotoAlbumObject(
-            key=Callback(CHPhotoBin, title=video_info['title'], thumb=video_info['thumb'], url=video_info['url']),
-            rating_key = video_info['url']+'/thumbs', source_title='ClipHunter',
-            title='Video Thumbs', thumb=R(ICON_PHOTOALBUM), art=R(ART_CH)
-            ))
-
-        try:
-            related_thumb = html.xpath('//li[@itemtype]/a[@class="t"]/img/@src')[0]
-        except:
-            try:
-                related_thumb = html.xpath('//li/a[@class="t"]/img/@src')[0]
-            except:
-                related_thumb = ''
-
-        if related_thumb != '':
+    plstar = html.xpath('//div[@class="pornstar-item"]')
+    if plstar and (not error):
+        if (len(plstar) == 1):
+            PornstarList(title='Pornstars', href=video_info['url'], page=1, oc=oc, container=False)
+        else:
             oc.add(DirectoryObject(
-                key=Callback(DirectoryList, title='Related', href=video_info['url'].split(CH_BASE_URL)[1], page=1),
-                title='Related Videos', thumb=related_thumb, art=R(ART_CH)
+                key=Callback(PornstarList, title='Pornstars', href=video_info['url'], page=1),
+                title='Pornstars in Video', thumb=R('icon-pornstar.png')
                 ))
 
-        mdl = html.xpath('//a[@class="materialButton mdl ps-popover"]')
-        if mdl:
-            p_name = mdl[0].text_content().strip()
-            p_href = mdl[0].get('href').rsplit('/', 1)[0].replace(' ', '+')
-            p_img = HTTP.Request(CH_BASE_URL + '/a/modelthumb?name=%s' %String.Quote(p_name, usePlus=True)).content
-            oc.add(DirectoryObject(
-                key=Callback(PornstarCH, title=p_name, href=p_href, thumb=p_img),
-                title=p_name, thumb=p_img, art=R(ART_CH)
-                ))
-        chnl = html.xpath('//a[@class="materialButton chnl"]')
-        if chnl:
-            chnl_title = chnl[0].text_content().strip()
-            chnl_href = chnl[0].get('href').replace(' ', '+')
-            oc.add(DirectoryObject(
-                key=Callback(HDOpt, title='Channels / '+chnl_title, href=chnl_href),
-                title=chnl_title, thumb=R(ICON_TV), art=R(ART_CH)
-                ))
-
-    bm_ch.add_remove_bookmark(
-        oc=oc, title=video_info['title'], thumb=video_info['thumb'], url=video_info['url'],
-        item_id=video_info['id'], category='Video', duration=video_info['duration'],
-        tagline=video_info['tagline']
-        )
+    if offline and (BM.bookmark_exist(video_info['id'], video_info['category']) == False):
+        Log.Info(u"* Skip 'add boomark' for offline video for '{}'".format(url))
+    else:
+        BM.add_remove_bookmark(oc, dict(video_info))
 
     return oc
-
-####################################################################################################
-def abc():
-    return map(chr, range(ord('A'), ord('Z')+1))
-
-####################################################################################################
-def pichunter_list(html, relative=False):
-    palist = []
-    for node in html.xpath('%s//a[@class="thumb"]' %('.' if relative else '')):
-        href = node.get('href')
-        title = node.xpath('./img/@alt')[0]
-        thumb = node.xpath('./img/@src')[0]
-        palist.append((title, thumb, href))
-    return palist
-
-####################################################################################################
-def nextpg_href(html):
-    nextpg_node = html.xpath('//li/a[@rel="next"]')
-    href = None
-    if nextpg_node:
-        href = nextpg_node[0].get('href')
-    return href

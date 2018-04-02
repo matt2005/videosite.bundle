@@ -4,19 +4,18 @@
 <dict>
   <key>URL</key>
   <dict>
-    <key>Videosite</key>
+    <key>LetFap</key>
     <dict>
       <key>Identifier</key>
-      <string>com.plexapp.plugins.videosite</string>
+      <string>com.plexapp.plugins.letfap</string>
       <key>URLPatterns</key>
       <array>
-        <string>(?x)https?://(?:www\.)?cliphunter\.com/w/([0-9]+)/(.+?)(?:$|[#\?])</string>
+        <string>^https?:\/\/letfap\.(?:[^/]+\/)?movie\/(.+)$</string>
       </array>
       <key>TestURLs</key>
       <array>
-        <string>http://www.cliphunter.com/w/2526569/21_and_needing_Money</string>
-        <string>http://www.cliphunter.com/w/2340799/Emo_Faye_Runaway_Anal_Fucked_by_Black_Cock</string>
-        <string>http://www.cliphunter.com/w/2306237/Tiny_tits_brunette_teen_whore_Izi_anal_pounded_and_creampied</string>
+        <string>http://letfap.com/movie/jenna--the-secretary-621.html</string>
+        <string>http://letfap.com/movie/jenna--date-night-at-home-379.html</string>
       </array>
     </dict>
   </dict>
